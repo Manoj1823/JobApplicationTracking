@@ -3,12 +3,10 @@ FROM node:18-alpine AS build-frontend
 
 WORKDIR /app
 
-# Copy frontend source files
-COPY package*.json vite.config.ts tsconfig.json ./         # base config files
-COPY index.html ./                                         # ✅ important for Vite
-COPY src ./src                                             # your React source code
+# Copy frontend source files (relative to context)
+COPY package*.json vite.config.ts tsconfig.json index.html ./
+COPY src ./src
 
-# Install and build
 RUN npm install
 RUN npm run build
 
