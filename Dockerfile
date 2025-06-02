@@ -1,39 +1,43 @@
 # ==========================
 # Stage 1: Build Frontend
 # ==========================
-FROM node:18-alpine AS frontend-build
+FROM node:18-alpine AS build-frontend
 
 WORKDIR /app
 
-# Copy package files and install dependencies
+# Install deps
 COPY package.json package-lock.json ./
 RUN npm install
 
-# 👇 Install dev dependencies for Vite config in TypeScript
+# Support Vite config in TypeScript
 RUN npm install -D ts-node typescript
 
-# Copy source code
+# Copy all code
 COPY . .
 
-# Pass VITE_API_URL at build time
+# Build with VITE_API_URL passed at build time
 ARG VITE_API_URL
 ENV VITE_API_URL=$VITE_API_URL
-
-# Build frontend
 RUN npm run build
 
-# Stage 2: Backend
+
+# ==========================
+# Stage 2: Backend & Serve Static Files
+# ==========================
 FROM node:18-alpine
 
 WORKDIR /app
 
+# Copy backend server and built frontend
 COPY backend ./backend
-COPY package*.json ./
 COPY --from=build-frontend /app/dist ./dist
+COPY package.json package-lock.json ./
 
+# Install only production dependencies
 RUN npm install --production
 
+# Expose port
 EXPOSE 5000
-ENV NODE_ENV=production
 
-CMD ["node", "backend/Server.cjs"]
+# Start server
+CMD ["node", "backend/Server.js"]
