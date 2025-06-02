@@ -6,6 +6,12 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+* text=auto
+*.js text
+*.json text
+*.ts text
+*.tsx text
+* text eol=lf
 
 node_modules
 dist

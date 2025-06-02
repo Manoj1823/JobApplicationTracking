@@ -1,25 +1,35 @@
-# Use official Node.js 18 image
-FROM node:18
+# Stage 1: Build frontend
+FROM node:18-alpine AS build-frontend
 
-# Set working directory
 WORKDIR /app
 
-# Copy all files (frontend + backend + package.json etc)
-COPY . .
+# Copy package files for frontend dependencies
+COPY package*.json ./
+COPY vite.config.ts ./
+COPY tsconfig.json ./
+COPY src ./src
 
-# Install backend dependencies
-RUN npm install
-
-# Change directory to frontend (src) and install dependencies + build
-WORKDIR /app/src
+# Install deps and build frontend
 RUN npm install
 RUN npm run build
 
-# Back to root (backend runs from backend folder)
-WORKDIR /app/backend
+# Stage 2: Build backend image
+FROM node:18-alpine
 
-# Expose port (same as your backend PORT)
+WORKDIR /app
+
+# Copy backend files
+COPY backend ./backend
+COPY package*.json ./
+
+# Copy frontend build output from previous stage
+COPY --from=build-frontend /app/dist ./dist
+
+# Install backend dependencies
+RUN npm install --production
+
+# Expose backend port
 EXPOSE 5000
 
-# Run backend server (it will serve frontend from /app/dist)
-CMD ["node", "Server.cjs"]
+# Start the backend server
+CMD ["node", "backend/Server.cjs"]

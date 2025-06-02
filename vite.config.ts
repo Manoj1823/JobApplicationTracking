@@ -8,7 +8,7 @@ export default defineConfig({
     exclude: ['lucide-react'],
   },
   build: {
-    outDir: path.resolve(__dirname, '../dist'),  // output at project root level, alongside backend folder
+    outDir: path.resolve(__dirname, 'dist'),  // output at project root level, alongside backend folder
     emptyOutDir: true,
   },
 });
