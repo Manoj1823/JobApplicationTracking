@@ -3,8 +3,10 @@ FROM node:18-alpine AS build-frontend
 
 WORKDIR /app
 
-# Copy frontend source files (relative to context)
-COPY package*.json vite.config.ts tsconfig.json index.html ./
+# Copy package files, Vite config, tsconfig files, and index.html
+COPY package*.json vite.config.ts tsconfig.json tsconfig.app.json index.html ./
+
+# Copy frontend source code
 COPY src ./src
 
 RUN npm install
@@ -15,20 +17,22 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Copy backend code
+# Copy backend source code
 COPY backend ./backend
 
-# Copy backend package files
+# Copy package files for backend dependencies
 COPY package*.json ./
 
-# Copy frontend build output
+# Copy frontend build output from previous stage
 COPY --from=build-frontend /app/dist ./dist
 
-# Install only backend dependencies
+# Install backend dependencies only (production)
 RUN npm install --production
 
 # Expose backend port
 EXPOSE 5000
+
 ENV NODE_ENV=production
-# Run the server (which also serves frontend)
+
+# Start the backend server (which also serves the frontend)
 CMD ["node", "backend/Server.cjs"]
