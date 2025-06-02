@@ -1,32 +1,37 @@
 # Stage 1: Build frontend
 FROM node:18-alpine AS build-frontend
 
+# Set working directory
 WORKDIR /app
 
-# Copy only frontend relevant files for dependency install and build
-COPY package*.json vite.config.ts tsconfig.json ./
-COPY src ./src
-
+# Install frontend dependencies
+COPY package.json package-lock.json ./
 RUN npm install
+
+# Copy all frontend source files needed for Vite build
+COPY . .
+
+# Build the frontend
 RUN npm run build
 
-# Stage 2: Backend build and runtime
-FROM node:18-alpine
 
+# Stage 2: Prepare production image with backend + built frontend
+FROM node:18-alpine AS production
+
+# Set working directory for backend
 WORKDIR /app
 
-# Copy backend source code and package files for backend install
+# Copy backend code
 COPY backend ./backend
-COPY package*.json ./
 
-# Copy frontend build output from previous stage
+# Copy built frontend from previous stage
 COPY --from=build-frontend /app/dist ./dist
 
-# Install backend production dependencies only
-RUN npm install --production
+# Copy node_modules if frontend and backend share dependencies
+COPY --from=build-frontend /app/node_modules ./node_modules
 
-# Expose port
-EXPOSE 5000
+# Copy any other required project files (e.g., .env if needed at runtime)
+# COPY .env .env
 
-# Run backend server
+# Set the default command (update if using a process manager like PM2)
 CMD ["node", "backend/Server.cjs"]
