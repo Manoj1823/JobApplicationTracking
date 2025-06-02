@@ -19,9 +19,6 @@ WORKDIR /app
 # Copy backend code
 COPY backend ./backend
 
-# Copy backend env file
-COPY .env .env
-
 # Copy backend package files
 COPY package*.json ./
 
