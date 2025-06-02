@@ -30,6 +30,6 @@ RUN npm install --production
 
 # Expose backend port
 EXPOSE 5000
-
+ENV NODE_ENV=production
 # Run the server (which also serves frontend)
 CMD ["node", "backend/Server.cjs"]
