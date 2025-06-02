@@ -372,10 +372,13 @@ app.get('/api/admin/activity', authenticate, isAdmin, async (req, res) => {
 
 // Serve static assets in production
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../dist')));
-  
+  const distPath = path.join(__dirname, '..', 'dist'); // Absolute path to /app/dist
+
+  app.use(express.static(distPath));
+
+  // For any route not handled by API, serve index.html
   app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, '../dist', 'index.html'));
+    res.sendFile(path.join(distPath, 'index.html'));
   });
 }
 
