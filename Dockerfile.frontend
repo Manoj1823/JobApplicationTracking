@@ -1,0 +1,13 @@
+# project/Dockerfile.frontend
+FROM node:18 AS builder
+
+WORKDIR /app
+COPY src/package*.json ./src/
+RUN cd src && npm install
+
+COPY . .
+
+RUN cd src && npm run build
+
+FROM nginx:alpine
+COPY --from=builder /app/src/dist /usr/share/nginx/html
