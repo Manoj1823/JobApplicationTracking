@@ -1,20 +1,25 @@
-# Use official Node.js image
+# Use official Node.js 18 image
 FROM node:18
 
-# Create app directory
+# Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json
-COPY package*.json ./
-
-# Install all dependencies (frontend + backend)
-RUN npm install
-
-# Copy the entire project
+# Copy all files (frontend + backend + package.json etc)
 COPY . .
 
-# Expose the backend port (change if your server uses a different port)
+# Install backend dependencies
+RUN npm install
+
+# Change directory to frontend (src) and install dependencies + build
+WORKDIR /app/src
+RUN npm install
+RUN npm run build
+
+# Back to root (backend runs from backend folder)
+WORKDIR /app/backend
+
+# Expose port (same as your backend PORT)
 EXPOSE 5000
 
-# Start both frontend and backend concurrently
-CMD ["npm", "run", "dev"]
+# Run backend server (it will serve frontend from /app/dist)
+CMD ["node", "Server.cjs"]
