@@ -40,4 +40,4 @@ RUN npm install --production
 EXPOSE 5000
 
 # Start server
-CMD ["node", "backend/Server.js"]
+CMD ["node", "backend/Server.cjs"]
