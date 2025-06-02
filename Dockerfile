@@ -12,6 +12,7 @@ COPY package*.json vite.config.ts tsconfig.json tsconfig.app.json tsconfig.node.
 COPY src ./src
 
 RUN npm install
+RUN npm install -D ts-node typescript
 RUN npm run build
 
 # Stage 2: Backend
