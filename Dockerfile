@@ -5,7 +5,6 @@ WORKDIR /app
 
 # Copy frontend files and env
 COPY package*.json vite.config.ts tsconfig.json ./
-COPY .env .env
 COPY src ./src
 
 # Install and build
